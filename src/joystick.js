@@ -1,22 +1,25 @@
 class RubIt extends Emitter {
 	constructor(args) {
 		super();
-		if(args instanceof Object){
-			this.args = args;
-		}
-		else {
-			console.log('Your format is wrong! Please pass arguments in an object.');
-		}
+		this.args = {
+			container_id: args.container_id || false,
+			type: args.type || 'dynamic',
+			area_width: args.area_width || 'auto',
+			area_height: args.area_height || 'auto',
+			outer_rad: args.outer_rad || '100px',
+			inner_rad: args.inner_rad || '60px',
+			outer_bg: args.outer_bg || 'radial-gradient(#56CCF2 0%, #2F80ED 100%)',
+			outer_border: args.outer_border || 'none',
+			inner_bg: args.inner_bg || 'radial-gradient(#56CCF2 0%, #2F80ED 100%)',
+			inner_border: args.inner_border || '1px solid #2F80ED'
+		};
 		this.build();
-		this.style();
+		this.stylize();
 		this.init();
 		this.pressed = false;
-		this.position = [0, 0];
 	}
 
 	build() {
-		this.el_main = document.createElement('div');
-		this.el_main.classList.add('rubit_main');
 		this.el_area = document.createElement('div');
 		this.el_area.classList.add('rubit_area');
 		this.el_container = document.createElement('div');
@@ -29,22 +32,58 @@ class RubIt extends Emitter {
 		this.el_outer.appendChild(this.el_inner);
 		this.el_container.appendChild(this.el_outer);
 		this.el_area.appendChild(this.el_container);
-		this.el_main.appendChild(this.el_area);
 		if(this.args.container_id) {
-			document.getElementById(this.args.container_id).appendChild(this.el_main);
+			document.getElementById(this.args.container_id).appendChild(this.el_area);
 		}
 		else {
-			document.body.appendChild(this.el_main);
+			document.body.appendChild(this.el_area);
 		}
 	}
 
-	style() {
-		this.el_outer.style.width = `${this.args.outer_rad}px`;
-		this.el_outer.style.height = `${this.args.outer_rad}px`;
-		this.el_inner.style.width = `${this.args.inner_rad}px`;
-		this.el_inner.style.height = `${this.args.inner_rad}px`;
-		this.el_inner.style.top = `calc(50% - ${this.args.inner_rad/2}px)`;
-		this.el_inner.style.left = `calc(50% - ${this.args.inner_rad/2}px)`;
+	stylize() {
+		const area = {
+					'position': 'relative',
+					// 'overflow': 'hidden',
+					'width': this.args.area_width,
+					'height': this.args.area_height,
+					'box-sizing': 'border-box',
+		}
+		const container = {
+					'position': 'relative',
+					'display': 'inline-block',
+					'box-sizing': 'border-box',
+		}
+		const outer = {
+					'position': 'relative',
+					'display': 'flex',
+					'justify-content': 'center',
+					'align-items': 'center',
+					'border': this.args.outer_border,
+					'background': this.args.outer_bg,
+					'border-radius': '50%',
+					'width': this.args.outer_rad,
+					'height': this.args.outer_rad,
+					'box-sizing': 'border-box',
+		}
+		const inner = {
+					'position': 'relative',
+					'border': this.args.inner_border,
+					'background': this.args.inner_bg,
+					'border-radius': '50%',
+					'width': this.args.inner_rad,
+					'height': this.args.inner_rad,
+					'box-sizing': 'border-box',
+		}
+		this.applyStyle(area, this.el_area);
+		this.applyStyle(container, this.el_container);
+		this.applyStyle(outer, this.el_outer);
+		this.applyStyle(inner, this.el_inner);
+	}
+
+	applyStyle(styles, element) {
+		for(const key in styles) {
+			element.style[key] = styles[key];
+		}
 	}
 
 	init() {
@@ -54,38 +93,40 @@ class RubIt extends Emitter {
 		document.addEventListener('mousedown', _mouseDown);
 		document.addEventListener('mousemove', _mouseMove);
 		document.addEventListener('mouseup', _mouseUp);
-
 		document.addEventListener('touchstart', _mouseDown);
-		document.addEventListener('touchmove', _mouseMove);
+		document.addEventListener('touchmove', _mouseMove, { passive: false });
 		document.addEventListener('touchend', _mouseUp);
 
-		const container = this.el_container.getBoundingClientRect();
+		const top = this.el_container.offsetTop;
+		const left = this.el_container.offsetLeft;
 
-		this.center = new Vector(container.left + this.args.outer_rad/2,
-								container.top + this.args.outer_rad/2);
+		this.center = new Vector(left, top);
 		this.inner = new Vector(0, 0);
 	}
-
+	
 	dynamic(e) {
+		// pageX and pageY are coords. of mouse relative to the entire document
+		// x and y are coords. of mouse relative to the viewport
 		let x, y;
 		if(e.changedTouches) {
-			y = e.changedTouches[0].pageY;
-			x = e.changedTouches[0].pageX;
+			y = e.changedTouches[0].pageY - window.scrollY;
+			x = e.changedTouches[0].pageX - window.scrollX;
 		}
 		else {
-			y = e.pageY;
-			x = e.pageX;
+			y = e.pageY - window.scrollY;
+			x = e.pageX - window.scrollX;
 		}
-		const top = y - this.el_main.offsetTop - this.el_container.offsetHeight/2;
-		const left = x - this.el_main.offsetLeft - this.el_container.offsetWidth/2;
+		const area = this.el_area.getBoundingClientRect();
+		const top = y - area.top - this.el_container.offsetHeight / 2;
+		const left = x - area.left - this.el_container.offsetWidth / 2;
+
 		this.el_container.style.top = `${top}px`;
 		this.el_container.style.left = `${left}px`;
 
-		const container = this.el_container.getBoundingClientRect();
-		this.center.set(container.left + this.args.outer_rad/2,
-						container.top + this.args.outer_rad/2);
+		this.center.set(left, top);
+		this.emit('reposition');
 	}
-
+	
 	mouseDown(e) {
 		e.preventDefault();
 		this.pressed = true;
@@ -94,43 +135,62 @@ class RubIt extends Emitter {
 		this.el_inner.style.transition = 'none';
 		
 		this.mouseMove(e);
+		this.emit('press');
 	}
+
 	mouseMove(e) {
 		e.preventDefault();
 		if(this.pressed) {
+			// pageX and pageY are coords. of mouse relative to the entire document
+			// x and y are coords. of mouse relative to the viewport
 			let x, y;
-			if(e.changedTouches) {
-				x = e.changedTouches[0].pageX;
-				y = e.changedTouches[0].pageY;
+			if (e.changedTouches) {
+				y = e.changedTouches[0].pageY - window.scrollY;
+				x = e.changedTouches[0].pageX - window.scrollX;
 			}
 			else {
-				x = e.pageX;
-				y = e.pageY;
+				y = e.pageY - window.scrollY;
+				x = e.pageX - window.scrollX;
 			}
-
-			this.inner.set(x, y);
-			const resVec = Vector.sub(this.center, this.inner);
-			resVec.limit(this.args.outer_rad/2);
+			const area = this.el_area.getBoundingClientRect();
+			const container = this.el_container.getBoundingClientRect();
+			const top = y - area.top - container.height / 2;
+			const left = x - area.left - container.width / 2;
 			
-			this.el_inner.style.top = `calc(50% - ${resVec.y+this.args.inner_rad/2}px)`;
-			this.el_inner.style.left = `calc(50% - ${resVec.x+this.args.inner_rad/2}px)`;
-
-			const moveX = resVec.x / this.args.outer_rad;
-			const moveY = resVec.y / this.args.outer_rad;
+			this.inner.set(left, top);
+			const resVec = Vector.sub(this.inner, this.center)
+										.limit(container.width / 2);
 			
-			this.position = [moveX, moveY];
-			this.emit('move', moveX, moveY);
+			this.el_inner.style.top = `${resVec.y}px`;
+			this.el_inner.style.left = `${resVec.x}px`;
+
+			const moveX = resVec.x / (container.width / 2);
+			const moveY = -resVec.y / (container.height / 2);
+			const data = {
+				x: moveX,
+				y: moveY,
+				distance: Math.sqrt(moveX ** 2 + moveY ** 2),
+				angle: Math.atan2(moveY, moveX) * 180 / Math.PI
+			}
+			
+			this.emit('move', data);
 		}
 	}
+
 	mouseUp(e) {
 		e.preventDefault();
 		this.pressed = false;
 		
 		this.el_inner.style.transition = 'all .1s ease-out 0s';
-		this.el_inner.style.top = `calc(50% - ${0+this.args.inner_rad/2}px)`;
-		this.el_inner.style.left = `calc(50% - ${0+this.args.inner_rad/2}px)`;
+		this.el_inner.style.top = `0px`;
+		this.el_inner.style.left = `0px`;
 		
-		this.position = [0, 0];
-		this.emit('move', 0, 0);
+		this.emit('move', {
+			x: 0,
+			y: 0,
+			distance: 0,
+			angle: 0
+		});
+		this.emit('release');
 	}
 }
