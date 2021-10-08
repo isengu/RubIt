@@ -26,14 +26,14 @@ Than you can define the joystick. Options that are passed when defining the joys
 const rubit = new RubIt({
   container_id: 'container_id',
   type: 'dynamic',
-	area_width: '300px',
-	area_height: '300px',
-	outer_rad: '100px',
-	inner_rad: '60px',
-	outer_bg: 'radial-gradient(#56CCF2 0%, #2F80ED 100%)',
-	outer_border: 'none',
-	inner_bg: 'radial-gradient(#56CCF2 0%, #2F80ED 100%)',
-	inner_border: '1px solid #2F80ED'
+  area_width: '300px',
+  area_height: '300px',
+  outer_rad: '100px',
+  inner_rad: '60px',
+  outer_bg: 'radial-gradient(#56CCF2 0%, #2F80ED 100%)',
+  outer_border: 'none',
+  inner_bg: 'radial-gradient(#56CCF2 0%, #2F80ED 100%)',
+  inner_border: '1px solid #2F80ED'
 });
 ```
 
@@ -69,14 +69,14 @@ Here is a sample on how should option values be:
 {
   container_id: 'container_id',
   type: 'dynamic',
-	area_width: '300px',
-	area_height: '300px',
-	outer_rad: '100px',
-	inner_rad: '60px',
-	outer_bg: 'radial-gradient(#56CCF2 0%, #2F80ED 100%)',
-	outer_border: 'none',
-	inner_bg: 'radial-gradient(#56CCF2 0%, #2F80ED 100%)',
-	inner_border: '1px solid #2F80ED'
+  area_width: '300px',
+  area_height: '300px',
+  outer_rad: '100px',
+  inner_rad: '60px',
+  outer_bg: 'radial-gradient(#56CCF2 0%, #2F80ED 100%)',
+  outer_border: 'none',
+  inner_bg: 'radial-gradient(#56CCF2 0%, #2F80ED 100%)',
+  inner_border: '1px solid #2F80ED'
 }
 ```
 
