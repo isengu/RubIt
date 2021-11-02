@@ -1,3 +1,4 @@
+/* RubIt - 02.11.2021 - https://github.com/dolmushcu/RubIt */
 class RubIt extends Emitter {
 	constructor(args) {
 		super();
