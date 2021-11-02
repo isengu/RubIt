@@ -102,3 +102,7 @@ It's fired when user release a touch.
 
 ### Reposition
 It's fired when joystick repositioned.
+
+## TODO
+- [ ] Keyboard controls
+- [ ] Multiple joystick support
