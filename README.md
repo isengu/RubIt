@@ -4,8 +4,8 @@ RubIt `/rʌbɪt/` is a virtual joystick for web apps.
 
 ## Demo
 
-- [Raw demo](https://dolmushcu.github.io/RubIt/)
-- [Usage example in a project](https://dolmushcu.github.io/RayCasting)
+- [Raw demo](https://isengu.github.io/RubIt/)
+- [Usage example in a project](https://isengu.github.io/RayCasting)
 
 ## How to use
 
